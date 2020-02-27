@@ -62,6 +62,7 @@ async function startQuestions() {
           viewAllRoles()
           break
         case 'Add A Role':
+          askToAddRole()
           break
         case 'Add A Department':
           askToCreateDepartment()
@@ -321,6 +322,44 @@ const updateEmployeeManager = (managerid, employeeid, cb) => {
   })
 }
 
+const askToAddRole = () => {
+  let departmentsData = getDepartments(departments => {
+    let departlist = []
+    departments.forEach((element) => {
+      let deptItem = `${element.department_id}:${element.name}`
+      departlist.push(deptItem)
+    })
+    const departmentPromt = prompt([{
+      type: 'list',
+      message: 'Which department is this new role for?',
+      name: `departmentItem`,
+      choices: departlist
+    }
+  , 
+  {
+    type: 'input',
+    name: `roleTitle`,
+    message: 'Please enter in the title for this new role.'
+  },
+  {
+    type: 'input',
+    name: `roleSalary`,
+    message: 'Please enter in the salary for this new role.'
+  }
+  ])
+      .then(({ departmentItem, roleTitle, roleSalary }) => {
+        let deptArray = departmentItem.split(':')
+        let roleItem = { department_id: deptArray[0], title: roleTitle, salary:roleSalary }
+        //console.log(departItem)
+        createRole(roleItem, () => { console.log(`New role added!`) })
+        startQuestions()
+
+      })
+  })
+
+}
+
+
 
 const askToRemoveDepartment = () => {
   let departmentsData = getDepartments(departments => {
@@ -344,7 +383,6 @@ const askToRemoveDepartment = () => {
 
       })
   })
-
 
 }
 
