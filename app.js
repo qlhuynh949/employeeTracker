@@ -109,7 +109,7 @@ const askToRemoveDepartment = () => {
     })
     const departmentPromt = prompt([{
       type: 'list',
-      message: 'Whih department to remove?',
+      message: 'Which department to remove?',
       name: `departmentItem`,
       choices: departlist
     }])
@@ -117,7 +117,7 @@ const askToRemoveDepartment = () => {
         let deptArray = departmentItem.split(':')
         //let departItem = { department_id: deptArray[0], name: deptArray[1] }
         //console.log(departItem)
-        deleteDepartment(deptArray[0], ()=>{console.log(`${deptArray[1]} deleted!`)})
+        deleteDepartment(deptArray[0], () => { console.log(`${deptArray[1]} deleted!`) })
         startQuestions()
 
       })
