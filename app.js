@@ -51,8 +51,11 @@ async function startQuestions() {
         case 'Remove Employee':
           break
         case 'Update Employee Role':
+          askToUpdateEmployeeRole()
+                    
           break
         case 'Update Employee Manager':
+          askToUpdateEmployeeManager()
           break
         case 'View All Roles':
           viewAllRoles()
@@ -100,8 +103,125 @@ async function askToCreateDepartment() {
     })
 }
 
+const askToUpdateEmployeeManager =()=>{
+  let employeesData = getEmployees(employees => {
+    let employeelist = []
+    employees.forEach((element) => {
+      let employItem = `${element.employee_id}:${element.first_name} ${element.last_name}`
+      employeelist.push(employItem)
+    })
+    const employeePrompt = prompt([{
+      type: 'list',
+      message: 'Which Employee to update manager?',
+      name: `employeeItem`,
+      choices: employeelist
+    }])
+      .then(({ employeeItem }) => {
+        let employeeArray = employeeItem.split(':')
+        askEmployeeManagerToUpdate(employeeArray)
+
+      })
+
+  })  
+}
+
+const askEmployeeManagerToUpdate = (employeeArray) => {
+  let managerData = getEmployees(manager => {
+    let managerlist = []
+    manager.forEach((element) => {
+      let managerItem = `${element.employee_id}:${element.first_name} ${element.last_name}`
+      if (element.employee_id !== employeeArray[0])
+      {
+          managerlist.push(managerItem)
+      }
+    })
+
+    const managerChangePrompt = prompt([{
+      type: 'list',
+      message: 'Choose the manager to change to?',
+      name: `managerChangeItem`,
+      choices: managerlist
+    }])
+      .then(({ managerChangeItem }) => {
+
+        let managerChangeArray = managerChangeItem.split(':')
+        updateEmployeeManager(managerChangeArray[0], employeeArray[0], () => {
+          console.log(`Manager changed to ${managerChangeArray[1]}.`)
+          startQuestions()
+        })
+
+      })
+  })
+}
+
+
+
+const askToUpdateEmployeeRole = () => {
+  let employeesData = getEmployees(employees => {
+    let employeelist = []
+    employees.forEach((element) => {
+      let employItem = `${element.employee_id}:${element.first_name} ${element.last_name}`
+      employeelist.push(employItem)
+    })
+    const employeePrompt = prompt([{
+      type: 'list',
+      message: 'Which Employee to update role?',
+      name: `employeeItem`,
+      choices: employeelist
+    }])
+      .then(({ employeeItem }) => {
+        let employeeArray = employeeItem.split(':')
+        askEmployeeRoleToUpdate(employeeArray)
+
+      })
+
+  })
+}
+
+const askEmployeeRoleToUpdate = (employeeArray) => {
+  let rolesData = getRoles(roles => {
+
+    let rolelist = []
+    roles.forEach((element) => {
+      let roleItem = `${element.role_id}:${element.title}`
+      rolelist.push(roleItem)
+    })
+
+    const roleChangePrompt = prompt([{
+      type: 'list',
+      message: 'Choose the role to change to?',
+      name: `roleChangeItem`,
+      choices: rolelist
+    }])
+      .then(({ roleChangeItem }) => {
+
+        let roleChangeArray = roleChangeItem.split(':')
+        updateEmployeeRole(roleChangeArray[0], employeeArray[0], () => {
+          console.log(`Role changed to ${roleChangeArray[1]}.`)
+          startQuestions()
+        })
+
+      })
+  })
+}
+
+const updateEmployeeRole = (roleid, employeeid, cb) => {
+  db.query('UPDATE employee SET role_id=? WHERE employee_id=?', [roleid, employeeid], err => {
+    if (err) throw err
+    cb()
+  })
+}
+
+const updateEmployeeManager = (managerid, employeeid, cb) => {
+  db.query('UPDATE employee SET manager_id=? WHERE employee_id=?', [managerid, employeeid], err => {
+    if (err) throw err
+    cb()
+  })
+}
+
+
 const askToRemoveDepartment = () => {
-  let departments = getDepartments(departments => {
+  let departmentsData = getDepartments(departments => {
     let departlist = []
     departments.forEach((element) => {
       let deptItem = `${element.department_id}:${element.name}`
@@ -124,6 +244,39 @@ const askToRemoveDepartment = () => {
   })
 
 
+}
+
+const updateEmployee = (updates, id, cb) => {
+  db.query('UPDATE employee SET ? WHERE ?', [updates, { employee_id: id }], err => {
+    if (err) throw err
+    cb()
+  })
+}
+
+const getEmployees = (cb) => {
+  db.query('SELECT * FROM employee', (err, employees) => {
+    if (err) throw err
+    cb(employees)
+  })
+}
+
+const getEmployeeById = (id, cb) => {
+  db.query(`
+    SELECT * FROM employee
+    WHERE ?
+  `, { employee_id: id }, (err, data) => {
+
+    if (err) throw err
+    // return items
+    cb(data)
+  })
+}
+
+const getRoles = (cb) => {
+  db.query('SELECT * FROM role', (err, role) => {
+    if (err) throw err
+    cb(role)
+  })
 }
 
 const getDepartments = (cb) => {
