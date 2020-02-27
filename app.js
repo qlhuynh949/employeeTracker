@@ -49,17 +49,16 @@ async function startQuestions() {
         case 'Add Employee':
           break
         case 'Remove Employee':
+          askToRemoveEmployee()
           break
         case 'Update Employee Role':
-          askToUpdateEmployeeRole()
-                    
+          askToUpdateEmployeeRole()                    
           break
         case 'Update Employee Manager':
           askToUpdateEmployeeManager()
           break
         case 'View All Roles':
           viewAllRoles()
-
           break
         case 'Add A Role':
           break
@@ -102,6 +101,40 @@ async function askToCreateDepartment() {
       })
     })
 }
+
+const askToRemoveEmployee=()=>
+{
+  let employeesData = getEmployees(employees => {
+    let employeelist = []
+    employees.forEach((element) => {
+      let employItem = `${element.employee_id}:${element.first_name} ${element.last_name}`
+      employeelist.push(employItem)
+    })
+    const employeePrompt = prompt([{
+      type: 'list',
+      message: 'Which Employee to remove?',
+      name: `employeeItem`,
+      choices: employeelist
+    }])
+      .then(({ employeeItem }) => {
+        let employeeArray = employeeItem.split(':')
+        deletEmployee(employeeArray[0],()=>{
+          console.log(`${employeeArray[1]} was removed.`)
+          startQuestions()
+        })
+
+      })
+
+  })    
+}
+
+const deletEmployee = (id, cb) => {
+  db.query('DELETE FROM employee WHERE ?', { employee_id: id }, err => {
+    if (err) throw err
+    cb()
+  })
+}
+
 
 const askToUpdateEmployeeManager =()=>{
   let employeesData = getEmployees(employees => {
