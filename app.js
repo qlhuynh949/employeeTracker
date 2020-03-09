@@ -53,7 +53,7 @@ async function startQuestions() {
           askToRemoveEmployee()
           break
         case 'Update Employee Role':
-          askToUpdateEmployeeRole()                    
+          askToUpdateEmployeeRole()
           break
         case 'Update Employee Manager':
           askToUpdateEmployeeManager()
@@ -104,76 +104,73 @@ async function askToCreateDepartment() {
     })
 }
 
-const askToAddEmployee=()=>
-{
-    let managerData = getEmployees(managers => {
+const askToAddEmployee = () => {
+  let managerData = getEmployees(managers => {
     let managerlist = []
     let noSelect = '0:No Manager'
     managerlist.push(noSelect)
     managers.forEach((element) => {
       let managerItem = `${element.employee_id}:${element.first_name} ${element.last_name}`
       managerlist.push(managerItem)
-      })
-    
+    })
+
 
     let rolesData = getRoles(roles => {
-    let rolelist = []
-    roles.forEach((element) => {
-      let roleItem = `${element.role_id}:${element.title}`
-      rolelist.push(roleItem)
+      let rolelist = []
+      roles.forEach((element) => {
+        let roleItem = `${element.role_id}:${element.title}`
+        rolelist.push(roleItem)
       })
-    
-    const employeePrompt = prompt([
-    {
-      type: 'input',
-      name: `employeeFirstName`,
-      message: 'Please enter in the first name of new  employee.'
-    },
-    {
-      type: 'input',
-      name: `employeeLastName`,
-      message: 'Please enter in the last name of new employee.'
-    },
-    {
-      type: 'list',
-      message: 'Who is the manager?',
-      name: `employeeManager`,
-      choices: managerlist
-    },
-    {
-      type: 'list',
-      message: 'What is their role?',
-      name: `employeeRole`,
-      choices: rolelist
-    }
-    ])
-    .then(
-      ({ employeeFirstName, employeeLastName, employeeManager, employeeRole }) => 
-      {
-        let roleArray = employeeRole.split(':')
-        let managerArray = employeeManager.split(':')
-        let newEmployee = {
-          first_name: employeeFirstName,
-          last_name: employeeLastName,
-          role_id: roleArray[0],
-          manager_id: managerArray[0]
+
+      const employeePrompt = prompt([
+        {
+          type: 'input',
+          name: `employeeFirstName`,
+          message: 'Please enter in the first name of new  employee.'
+        },
+        {
+          type: 'input',
+          name: `employeeLastName`,
+          message: 'Please enter in the last name of new employee.'
+        },
+        {
+          type: 'list',
+          message: 'Who is the manager?',
+          name: `employeeManager`,
+          choices: managerlist
+        },
+        {
+          type: 'list',
+          message: 'What is their role?',
+          name: `employeeRole`,
+          choices: rolelist
         }
+      ])
+        .then(
+          ({ employeeFirstName, employeeLastName, employeeManager, employeeRole }) => {
+            let roleArray = employeeRole.split(':')
+            let managerArray = employeeManager.split(':')
+            let newEmployee = {
+              first_name: employeeFirstName,
+              last_name: employeeLastName,
+              role_id: roleArray[0],
+              manager_id: managerArray[0]
+            }
 
-        let newName = newEmployee.first_name + ' ' + newEmployee.last_name
+            let newName = newEmployee.first_name + ' ' + newEmployee.last_name
 
-        createEmployee(newEmployee, () => {
-          console.log(`${newName} Created!`)
-          startQuestions()
-        })
+            createEmployee(newEmployee, () => {
+              console.log(`${newName} Created!`)
+              startQuestions()
+            })
 
-      })
+          })
     })
   })
 }
 
 
-const askToRemoveEmployee=()=>
-{
+const askToRemoveEmployee = () => {
   let employeesData = getEmployees(employees => {
     let employeelist = []
     employees.forEach((element) => {
@@ -188,14 +185,14 @@ const askToRemoveEmployee=()=>
     }])
       .then(({ employeeItem }) => {
         let employeeArray = employeeItem.split(':')
-        deletEmployee(employeeArray[0],()=>{
+        deletEmployee(employeeArray[0], () => {
           console.log(`${employeeArray[1]} was removed.`)
           startQuestions()
         })
 
       })
 
-  })    
+  })
 }
 
 const deletEmployee = (id, cb) => {
@@ -206,7 +203,7 @@ const deletEmployee = (id, cb) => {
 }
 
 
-const askToUpdateEmployeeManager =()=>{
+const askToUpdateEmployeeManager = () => {
   let employeesData = getEmployees(employees => {
     let employeelist = []
     employees.forEach((element) => {
@@ -225,7 +222,7 @@ const askToUpdateEmployeeManager =()=>{
 
       })
 
-  })  
+  })
 }
 
 const askEmployeeManagerToUpdate = (employeeArray) => {
@@ -233,9 +230,8 @@ const askEmployeeManagerToUpdate = (employeeArray) => {
     let managerlist = []
     manager.forEach((element) => {
       let managerItem = `${element.employee_id}:${element.first_name} ${element.last_name}`
-      if (element.employee_id !== employeeArray[0])
-      {
-          managerlist.push(managerItem)
+      if (element.employee_id !== employeeArray[0]) {
+        managerlist.push(managerItem)
       }
     })
 
@@ -335,21 +331,21 @@ const askToAddRole = () => {
       name: `departmentItem`,
       choices: departlist
     }
-  , 
-  {
-    type: 'input',
-    name: `roleTitle`,
-    message: 'Please enter in the title for this new role.'
-  },
-  {
-    type: 'input',
-    name: `roleSalary`,
-    message: 'Please enter in the salary for this new role.'
-  }
-  ])
+      ,
+    {
+      type: 'input',
+      name: `roleTitle`,
+      message: 'Please enter in the title for this new role.'
+    },
+    {
+      type: 'input',
+      name: `roleSalary`,
+      message: 'Please enter in the salary for this new role.'
+    }
+    ])
       .then(({ departmentItem, roleTitle, roleSalary }) => {
         let deptArray = departmentItem.split(':')
-        let roleItem = { department_id: deptArray[0], title: roleTitle, salary:roleSalary }
+        let roleItem = { department_id: deptArray[0], title: roleTitle, salary: roleSalary }
         //console.log(departItem)
         createRole(roleItem, () => { console.log(`New role added!`) })
         startQuestions()
@@ -436,8 +432,11 @@ const getDepartments = (cb) => {
 const createDepartment = (department, cb) => {
   db.query('INSERT INTO department SET ?', department, err => {
     if (err) throw err
+    cb()
   })
 }
+
+
 
 const deleteDepartment = (id, cb) => {
   db.query('DELETE FROM department WHERE ?', { department_id: id }, err => {
